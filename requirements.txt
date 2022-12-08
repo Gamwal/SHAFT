@@ -5,3 +5,4 @@ plotly
 altair
 datetime
 pyodbc
+openpyxl
