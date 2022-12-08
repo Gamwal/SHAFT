@@ -3,5 +3,5 @@ pandas
 scipy
 plotly
 altair
-streamlit
 datetime
+pyodbc
