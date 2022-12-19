@@ -9,12 +9,17 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
 import plotly.express as px
+from PIL import Image
 import altair as alt
 import streamlit as st
 from datetime import date
 from arps_equations import *
 from data_loader import *
 from display_plots import *
+
+#%%
+image = Image.open('SHAFT_logo.jpg')
+st.image(image, use_column_width=True)
 
 #%%% Welcome text and 
 st.write(""" 
