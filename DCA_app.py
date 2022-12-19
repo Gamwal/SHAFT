@@ -52,7 +52,7 @@ st.sidebar.header('Input selection')
 form1 = st.sidebar.form("my_form")
 
 well = form1.selectbox(
-    "Select Column for Unique Well Identifier (Must be of the form 'fieldnamewellno:reservoir')",
+    "Select Column for Unique Well Identifier (Must be of the form 'fieldnamewellno:reservoir' e.g ASHA045L:F1234D)",
     (data.columns.to_list()))
 
 oil_prod = form1.selectbox(
