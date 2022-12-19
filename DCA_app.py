@@ -285,9 +285,17 @@ lBounds = [qi-0.01,0,0.01]
 uBounds = [qi,0.01,0.99]
 bounds = (lBounds,uBounds)
 
-ExpPara, ArpsRateExpMin = curve_fit(ArpsRateExp,xdata,np.log(ydata),bounds=([exp_qi-0.01,0],[exp_qi,0.001]),method='trf')
-HarPara, ArpsRateHarMin = curve_fit(ArpsRateHar,xdata,ydata,bounds=([qi-0.01,0],[qi,0.01]),method='trf')
-HypPara, ArpsRateHypMin = curve_fit(ArpsRateHyp,xdata,ydata,bounds=bounds,method='trf')
+try:
+    ExpPara, ArpsRateExpMin = curve_fit(ArpsRateExp,xdata,np.log(ydata),bounds=([exp_qi-0.01,0],[exp_qi,0.001]),method='trf')
+    HarPara, ArpsRateHarMin = curve_fit(ArpsRateHar,xdata,ydata,bounds=([qi-0.01,0],[qi,0.01]),method='trf')
+    HypPara, ArpsRateHypMin = curve_fit(ArpsRateHyp,xdata,ydata,bounds=bounds,method='trf')
+except ValueError:
+    st.write("Invalid selection, please check the choke details")
+    st.stop()
+
+#ExpPara, ArpsRateExpMin = curve_fit(ArpsRateExp,xdata,np.log(ydata),bounds=([exp_qi-0.01,0],[exp_qi,0.001]),method='trf')
+#HarPara, ArpsRateHarMin = curve_fit(ArpsRateHar,xdata,ydata,bounds=([qi-0.01,0],[qi,0.01]),method='trf')
+#HypPara, ArpsRateHypMin = curve_fit(ArpsRateHyp,xdata,ydata,bounds=bounds,method='trf')
 
 fc_days = fc_years*365
 true_cumm = (date.today() - subset['date'].min()).days
