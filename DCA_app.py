@@ -18,7 +18,7 @@ from data_loader import *
 from display_plots import *
 
 #%%
-image = Image.open('SHAFT_logo.jpg')
+image = Image.open('SHAFT_logo.png')
 st.image(image, use_column_width=True)
 
 #%%% Welcome text and 
