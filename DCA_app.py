@@ -18,9 +18,8 @@ from display_plots import *
 
 #%%% Welcome text and 
 st.write(""" 
-         ## Production Analysis and Forecasting Tool
-         ## SHAFT
-         This application assists in production forecasting using Arps Equations for Decline Curve Analysis  
+         ### Sahara Hydocarbon Assets Forecasting Tool (S.H.A.F.T)
+         #### Production Analysis and Forecasting using Decline Curve Analysis         
          
          """)
 
@@ -306,7 +305,8 @@ f = (FC_start_date - k)
 length2 = np.linspace(0,fc_days,spacing)
 
 #dates2 = pd.date_range(start=subset[prod_date].max(),end=date.today()+pd.DateOffset(days=fc_days),periods=spacing).date
-dates2 = pd.date_range(start=DCA_data[prod_date].max()+f,end=DCA_data[prod_date].max()+f+pd.DateOffset(days=fc_days),periods=spacing).date
+#dates2 = pd.date_range(start=DCA_data[prod_date].max()+f,end=DCA_data[prod_date].max()+f+pd.DateOffset(days=fc_days),periods=spacing).date
+dates2 = pd.date_range(start=FC_start_date, end=FC_start_date+pd.DateOffset(days=fc_days), periods=spacing).date
 
 FC_Qi = table['Oil Rate'].iloc[-1]
 
