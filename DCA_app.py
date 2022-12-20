@@ -141,6 +141,10 @@ plot_subset[choke] = plot_subset[choke].astype(str)
 #fig.update_layout({'legend_title_text': tag})
 #st.plotly_chart(fig)
 
+if (subset['Oil Rate'].min() == subset['Oil Rate'].max()) or (len(subset) == 1):
+    st.write("Not enough data to carry out DCA, kindly reselect")
+    st.stop()
+
 #%% manipulate the data depending on the DCA type to be carried out
 if dca_method in ('Reservoir','Field'):
     if subset[prod_date].nunique() == subset.shape[0]:
@@ -157,6 +161,10 @@ if dca_method in ('Reservoir','Field'):
              max_value = date.today(),
              value = subset['date'].max(),
              format = "YYYY-MM-DD")
+        #Qc = form2.number_input(
+            #label="Choose Forecast Start Rate",
+            #min_value=0.0,
+            #value=table['Oil Rate'].iloc[-1])
         fc_years = form2.number_input(
             'Enter number of years for Forecast')
         EL = form2.number_input(
@@ -221,7 +229,11 @@ if dca_method in ('Reservoir','Field'):
              min_value = subset['date'].max(),
              max_value = date.today(),
              value = subset['date'].max(),
-             format = "YYYY-MM-DD")        
+             format = "YYYY-MM-DD")
+        #Qc = form2.number_input(
+            #label="Choose Forecast Start Rate",
+            #min_value=0.0,
+            #value=table['Oil Rate'].iloc[-1])        
         fc_years = form2.number_input(
             'Enter number of years for Forecast')
         EL = form2.number_input(
@@ -259,6 +271,10 @@ else:
          max_value = date.today(),
          value = subset['date'].max(),
          format = "YYYY-MM-DD")
+    #Qc = form2.number_input(
+        #label="Choose Forecast Start Rate",
+        #min_value=0.0,
+        #value=table['Oil Rate'].iloc[-1])
     fc_years = form2.number_input(
         'Enter number of years for Forecast')
     EL = form2.number_input(
@@ -314,6 +330,7 @@ length2 = np.linspace(0,fc_days,spacing)
 dates2 = pd.date_range(start=FC_start_date, end=FC_start_date+pd.DateOffset(days=fc_days), periods=spacing).date
 
 FC_Qi = table['Oil Rate'].iloc[-1]
+#FC_Qi = Qc
 
 Qi_1, Di_1 = np.exp(ExpPara[0]), ExpPara[1]
 #Di_1 = 0.075/100
@@ -350,9 +367,14 @@ D_1 = NominalDecline(Di_1, subset['Cum days'].max(), 0)
 D_2 = NominalDecline(Di_2, subset['Cum days'].max(), 1)
 D_3 = NominalDecline(Di_3, subset['Cum days'].max(), b_3)
 
-Reserves_1 = max(0,ArpsCumProd(Qc, Qel, D_1, 0))
-Reserves_2 = max(0,ArpsCumProd(Qc, Qel, D_2, 1))
-Reserves_3 = max(0,ArpsCumProd(Qc, Qel, D_3, b_3))
+if Qel == 0:
+    Reserves_1 = 0
+    Reserves_2 = 0
+    Reserves_3 = 0
+else:
+    Reserves_1 = max(0,ArpsCumProd(Qc, Qel, D_1, 0))
+    Reserves_2 = max(0,ArpsCumProd(Qc, Qel, D_2, 1))
+    Reserves_3 = max(0,ArpsCumProd(Qc, Qel, D_3, b_3))
 
 cum_prod = subset['Cum Oil Prod'].max()
 
@@ -385,18 +407,18 @@ Reserves_3 = "{:.3f}".format(Reserves_3/1000000)
 Total_1 = "{:.3f}".format(Total_1/1000000)
 Total_2 = "{:.3f}".format(Total_2/1000000)
 Total_3 = "{:.3f}".format(Total_3/1000000)
-
+    
 #%%%
 #Fit Plot
-fit_plotter(subset,prod_date,color_1,dca_method,sort_by,tag,subset_pred_melt)
+#fit_plotter(subset,prod_date,color_1,dca_method,sort_by,tag,subset_pred_melt)
 
 #Forecast Plot
 #forecast_plotter(subset,choke,prod_date,color_1,dca_method,sort_by,tag,subset_fc_melt,EL)
 
 #Combination Plot
-combined_plotter(keep,prod_date,color_1,dca_method,sort_by,tag,subset_fc_melt,EL,subset_pred_melt,plot_subset)
+#combined_plotter(keep,prod_date,color_1,dca_method,sort_by,tag,subset_fc_melt,EL,subset_pred_melt,plot_subset)
 
-combined_log_plotter(keep,prod_date,color_1,dca_method,sort_by,tag,subset_fc_melt,EL,subset_pred_melt,plot_subset)
+#combined_log_plotter(keep,prod_date,color_1,dca_method,sort_by,tag,subset_fc_melt,EL,subset_pred_melt,plot_subset)
 
 #%%
 DCA_data_sub = keep[['date','Oil Rate']]
@@ -480,8 +502,22 @@ c1 = alt.layer(line3, line4, line5, line6, line7).resolve_scale(
     y = 'independent'
 )
 
-st.altair_chart(c1, use_container_width=True)
+#st.altair_chart(c1, use_container_width=True)
 
+#%%
+tab1, tab2, tab3, tab4 = st.tabs(["Zoomed-in Fit Plot","Full Fit Plot","Exponential Case Log Plot","Production Plot"])
+with tab1:
+    fit_plotter(subset,prod_date,color_1,dca_method,sort_by,tag,subset_pred_melt)
+    
+with tab2:
+    combined_plotter(keep,prod_date,color_1,dca_method,sort_by,tag,subset_fc_melt,EL,subset_pred_melt,plot_subset)
+    
+with tab3:
+    combined_log_plotter(keep,prod_date,color_1,dca_method,sort_by,tag,subset_fc_melt,EL,subset_pred_melt,plot_subset)
+    
+with tab4:
+    st.altair_chart(c1, use_container_width=True)
+    
 #%%%
 pred_table = subset[[prod_date,'Oil Rate','ArpsRateExpPredict','ArpsRateHarPredict','ArpsRateHypPredict']].reset_index(drop=True)
 with st.expander("Expand to view predictions table"):
