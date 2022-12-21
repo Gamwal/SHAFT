@@ -6,3 +6,4 @@ altair
 datetime
 pyodbc
 openpyxl
+django

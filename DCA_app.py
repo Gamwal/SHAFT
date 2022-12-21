@@ -4,7 +4,13 @@ Created on Mon Jun  1 08:14:18 2022
 
 @author: gamaliel.adun
 """
+#%%Authentication 
+
+
+
+
 #%% Import the needed Libraries & Equations
+import os
 import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
@@ -16,11 +22,54 @@ from datetime import date
 from arps_equations import *
 from data_loader import *
 from display_plots import *
+from django.core.wsgi import get_wsgi_application
 
 #%%
 image = Image.open('SHAFT_logo.jpg')
 st.image(image, use_column_width=True)
 
+#%%
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+application = get_wsgi_application()
+from django.contrib.auth import authenticate
+
+def check_password():
+    """Returns `True` if the user had a correct password."""
+
+    def password_entered():
+        """Checks whether a password entered by the user is correct."""
+        user = authenticate(
+            username=st.session_state["username"], password=st.session_state["password"]
+        )
+
+        if user is not None:
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]  # don't store username + password
+            del st.session_state["username"]
+        else:
+            st.session_state["password_correct"] = False
+
+    if "password_correct" not in st.session_state:
+        # First run, show inputs for username + password.
+        st.text_input("Username", on_change=password_entered, key="username")
+        st.text_input(
+            "Password", type="password", on_change=password_entered, key="password"
+        )
+        return False
+    elif not st.session_state["password_correct"]:
+        # Password not correct, show input + error.
+        st.text_input("Username", on_change=password_entered, key="username")
+        st.text_input(
+            "Password", type="password", on_change=password_entered, key="password"
+        )
+        st.error("😕 User not known or password incorrect")
+        return False
+    else:
+        # Password correct.
+        return True
+    
+if not check_password():
+    st.stop()
 #%%% Welcome text and 
 st.write(""" 
          ## Sahara Hydocarbon Assets Forecasting Tool
