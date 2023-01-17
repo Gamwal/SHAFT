@@ -1,4 +1,4 @@
 #!/bin/bash
+source devenv/bin/activate
 cd /home/sefladmin/SHAFT
-conda activate devenv
 streamlit run DCA_app.py
